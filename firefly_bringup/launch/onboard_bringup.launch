@@ -8,12 +8,13 @@
   <arg name="use_rtk_offset" default="false"/>
   <arg name="lat0rtk" default="40.441751"/>
   <arg name="lon0rtk" default="-79.9441072"/>
+  <arg name="threshold" default="50"/>
 
 
   <node pkg="firefly_mapping" type="onboard_mapping" name="onboard_mapping" output="screen"/>
   <node pkg="firefly_telemetry" type="onboard_telemetry.py" name="onboard_telemetry" output="screen"/>
   <node pkg="firefly_perception" type="firefly_perception" name="firefly_perception" output="screen">
-    <param name="threshold" value="50"/>
+    <param name="threshold" value="$(arg threshold)"/>
     <param name="continuous" value="$(arg continuous)"/>
   </node>  
 

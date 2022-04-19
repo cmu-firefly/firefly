@@ -12,8 +12,6 @@ class GPS2LocalENU:
             self.d = yaml.load(f, Loader=yaml.FullLoader)
         
         self.lat0, self.lon0, self.h0 = rospy.get_param("local_pos_ref")
-        self.lat0 = 40.479537
-        self.lon0 = -79.8946071
 
         self.gps2local()
 

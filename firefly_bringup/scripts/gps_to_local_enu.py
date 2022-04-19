@@ -33,16 +33,11 @@ class GPS2LocalENU:
         self.z = None
 
         if rospy.has_param('~lat0rtk') and rospy.has_param('~lon0rtk'):
-            self.use_rtk_offset = True
             self.lat0rtk = rospy.get_param('~lat0rtk')
             self.lon0rtk = rospy.get_param('~lon0rtk')
         else:
-            self.use_rtk_offset = False
             self.lat0rtk = None
             self.lon0rtk = None
-        self.x_offset = None
-        self.y_offset = None
-
 
     def attitude_callback(self, data):
         self.attitude = data.quaternion
@@ -62,12 +57,10 @@ class GPS2LocalENU:
         self.h0 = self.h
 
         response = SetLocalPosRefResponse()
-        if self.use_rtk_offset and (self.lat0rtk is not None) and (self.lon0rtk is not None):
+        if self.lat0rtk is not None and self.lon0rtk is not None:
             response.latitude = self.lat0rtk
             response.longitude = self.lon0rtk
             response.altitude = self.h0
-            self.x_offset, self.y_offset, _ = pm.enu.geodetic2enu(self.lat0, self.lon0, self.h0, self.lat0rtk, self.lon0rtk, self.h0)
-            rospy.logerr("X Offset: %d, Y Offset: %d" % (self.x_offset, self.y_offset))
         else:
             response.latitude = self.lat0
             response.longitude = self.lon0
@@ -89,9 +82,6 @@ class GPS2LocalENU:
         # TODO: Check that both GPS and attitude time stamps are recent
         # TODO: Change TF time stamp to be latest between GPS and attitude time stamps
         self.x, self.y, self.z = pm.enu.geodetic2enu(self.lat, self.lon, self.h, self.lat0, self.lon0, self.h0)
-        if self.use_rtk_offset and (self.x_offset is not None) and (self.y_offset is not None):
-            self.x += self.x_offset
-            self.y += self.y_offset
         self.br.sendTransform((self.x, self.y, self.z),
                               (self.attitude.x, self.attitude.y, self.attitude.z, self.attitude.w),
                               rospy.Time.now(),
